@@ -1,0 +1,7 @@
+a = "Some string"
+this_string = "The second string"
+echo(this_string)
+
+c = "1234"
+
+echo(c)
