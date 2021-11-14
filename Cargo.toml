@@ -7,4 +7,3 @@ edition = "2021"
 
 [dependencies]
 regex = "1"
-binary-tree = "0.2.0"

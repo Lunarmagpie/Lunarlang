@@ -2,10 +2,12 @@ use std::fs::File;
 use std::io::prelude::*;
 use std::path::Path;
 
-mod lex;
-mod parse;
+pub mod lex;
+pub mod parse;
 
-pub fn main(filename: &String) {
+use super::interpreter;
+
+pub fn main(filename: &String) -> Vec<parse::AST> {
     // Create a path to the desired file
     let path = Path::new(filename);
     let display = path.display();
@@ -23,6 +25,6 @@ pub fn main(filename: &String) {
         Ok(_) => lex::main(s),
     };
 
-    parse::main(tokens);
+    parse::main(tokens)
 
 }
