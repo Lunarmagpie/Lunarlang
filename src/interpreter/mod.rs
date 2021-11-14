@@ -17,48 +17,61 @@ pub fn main(ast: Vec<AST>) {
     )])];
 
     for action in ast {
-        let a = action.payload.unwrap();
-        match a {
-            ASTPayload::Action(Actions::ASSIGN) => {
-                let var_name = action.left.unwrap().payload.unwrap();
-                let assign_value = action.right.unwrap().payload.unwrap();
+        parse_node(&mut mem, action);
+    }
+}
 
-                mem.last_mut().unwrap().insert(
-                    match var_name {
-                        ASTPayload::Var(value) => value,
+fn get_mem<'a>(mem: &'a Vec<HashMap<String, MoonObject>>, var: &String) -> &'a MoonObject<'a> {
+    for level in mem.into_iter().rev() {
+        let vec: Vec<&String> = level.keys().collect();
+        if vec.contains(&var) {
+            return &level[var];
+        }
+    }
+
+    panic!("variable `{}` not found!", var);
+}
+
+fn parse_node(mem: &mut Vec<HashMap<String, MoonObject>>, action: AST) {
+    let a = action.payload.unwrap();
+    match a {
+        ASTPayload::Action(Actions::ASSIGN) => {
+            let var_name = action.left.unwrap().payload.unwrap();
+            let assign_value = action.right.unwrap().payload.unwrap();
+
+            mem.last_mut().unwrap().insert(
+                match var_name {
+                    ASTPayload::Var(value) => value,
+                    _ => panic!("something went wrong"),
+                },
+                MoonObject::String(match assign_value {
+                    ASTPayload::Const(value) => match value {
+                        Constant::String(value2) => value2,
                         _ => panic!("something went wrong"),
                     },
-                    MoonObject::String(match assign_value {
-                        ASTPayload::Const(value) => match value {
-                            Constant::String(value2) => value2,
-                            _ => panic!("something went wrong"),
-                        },
-                        _ => panic!("something went wrong"),
-                    }),
-                );
-            }
-            ASTPayload::Action(Actions::CALL) => {
-                let func_var = action.left.unwrap().payload.unwrap();
-                let args_vec = action.right.unwrap().payload.unwrap();
+                    _ => panic!("something went wrong"),
+                }),
+            );
+        }
+        ASTPayload::Action(Actions::CALL) => {
+            let func_var = action.left.unwrap().payload.unwrap();
+            let args_vec = action.right.unwrap().payload.unwrap();
 
-                let args = if let ASTPayload::Vars(a) = args_vec {
-                    a
-                } else {
-                    vec![]
-                };
+            let args = if let ASTPayload::Vars(a) = args_vec {
+                a
+            } else {
+                vec![]
+            };
 
-                if let ASTPayload::Var(name) = func_var {
-                    let func_holder = &mem.last().unwrap()[&name];
-
-                    let vars: MoonArgs = args.iter().map(|a| &mem.last().unwrap()[a]).collect();
-
-                    if let MoonObject::Function(func) = func_holder {
-                        func(vars);
-                    }
+            if let ASTPayload::Var(name) = func_var {
+                let vars: MoonArgs = args.iter().map(|a| get_mem(mem, a)).collect();
+                let func_holder = get_mem(&mem, &name);
+                if let MoonObject::Function(func) = func_holder {
+                    func(vars);
                 }
             }
-
-            _ => {}
         }
+
+        _ => {}
     }
 }
