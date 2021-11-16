@@ -1,5 +1,1 @@
-fn main(a) do
-    echo(arg,"1234")
-end
-
-main("123")
+main("123", "efg", 683)

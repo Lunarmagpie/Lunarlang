@@ -7,7 +7,7 @@ pub mod actions;
 pub mod objects;
 pub mod ast;
 
-use ast::parse::{Constant, Node, Payload};
+use ast::parse::{Var, Node, Payload};
 use actions::Actions;
 pub use objects::{MoonArgs, MoonObject, MoonResult};
 
@@ -48,12 +48,12 @@ impl<'a> Interpreter<'a> {
 
         // Read the file contents into a string, returns `io::Result<usize>`
         let mut s = String::new();
-        println!("{:?}", s);
         let tokens = match file.read_to_string(&mut s) {
             Err(why) => panic!("couldn't read {}: {}", display, why),
             Ok(_) => ast::main(s),
         };
-
+        
+        println!("{:?}", tokens);
 
 
 

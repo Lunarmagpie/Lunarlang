@@ -81,7 +81,7 @@ pub fn main(content: String) -> Vec<Vec<Token>> {
         Rule::new(r"fn", TType::FuncDef),
         //
         Rule::new(r"=", TType::Equals),
-        Rule::new("\".*\"", TType::String),
+        Rule::new("\"[^\"]+\"", TType::String),
         Rule::new(r"\d+", TType::Digit),
         Rule::new(r"\d+\.\d+", TType::Float),
         //
