@@ -35,7 +35,7 @@ impl<'a> Interpreter<'a> {
         panic!("variable `{}` not found!", var);
     }
 
-    fn parse_file(&self, filename: &String) {
+    pub fn parse_file(&self, filename: &String) {
         // Create a path to the desired file
         let path = Path::new(filename);
         let display = path.display();
