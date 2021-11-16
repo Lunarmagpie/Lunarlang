@@ -1,4 +1,4 @@
-fn main(arg) do
+fn main(a) do
     echo(arg,"1234")
 end
 

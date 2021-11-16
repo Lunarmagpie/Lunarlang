@@ -126,7 +126,7 @@ pub fn main(content: String) -> Vec<Vec<Token>> {
                     ttype: x.ttype,
                 })
                 .filter(|x| x.ttype != TType::Whitespace)
-                .collect::<Vec<Token>>(),
+                .collect::<Vec<Token>>()
         );
     }
 
