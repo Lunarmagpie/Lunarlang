@@ -48,10 +48,12 @@ impl<'a> Interpreter<'a> {
 
         // Read the file contents into a string, returns `io::Result<usize>`
         let mut s = String::new();
+        println!("{:?}", s);
         let tokens = match file.read_to_string(&mut s) {
             Err(why) => panic!("couldn't read {}: {}", display, why),
             Ok(_) => ast::main(s),
         };
+
 
 
 
