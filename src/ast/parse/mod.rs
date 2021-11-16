@@ -18,46 +18,14 @@ pub fn main(tokens: Vec<Vec<Token>>) -> Vec<AST> {
 
 fn parse_line(tokens: Vec<Token>) -> AST {
 
-    let var = &tokens[0];
-    let action = &tokens[1];
-    let value = &tokens[2];
+    match tokens[0].ttype {
+        TType::FuncDef => {
 
-    match action.ttype {
-        TType::EQUALS => {
-            
-            
-            AST {
-                left: Some(Box::new(AST {
-                    left: None,
-                    right: None,
-                    payload: Some(ASTPayload::Var(var.token.to_string()))
-                })),
-                right: Some(Box::new(AST {
-                    left: None,
-                    right: None,
-                    payload: Some(ASTPayload::Const(Constant::String(value.token.to_string())))
-                })),
-                payload: Some(ASTPayload::Action(Actions::ASSIGN))
-            }
-            
-        },
-        TType::OPEN_PAREN => {
-            
-            AST {
-                left: Some(Box::new(AST {
-                    left: None,
-                    right: None,
-                    payload: Some(ASTPayload::Var(var.token.to_string()))
-                })),
-                right: Some(Box::new(AST {
-                    left: None,
-                    right: None,
-                    payload: Some(ASTPayload::Vars(vec![value.token.to_string()]))
-                })),
-                payload: Some(ASTPayload::Action(Actions::CALL))
-            }
+
         },
 
         _ => panic!("Syntax error"),
-    }
+    };
+
+    panic!();
 }

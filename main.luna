@@ -1,3 +1,5 @@
-a = 1234
-b = 2
-echo(a)
+fn main(arg) do
+    echo(arg,"1234")
+end
+
+main("123")

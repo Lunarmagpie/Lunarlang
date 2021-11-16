@@ -1,22 +1,33 @@
 use regex::{Match, Regex};
 use std::collections::HashMap;
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub enum TType {
-    VAR,
-    OPEN_PAREN,
-    CLOSE_PAREN,
-    FUNC_START,
+    //Whitespace
+    Whitespace,
+
+    //Keywords
+    OpenParen,
+    CloseParen,
+    Comma,
+    EnterScope,
+    ExitScope,
+    FuncDef,
+
+    //Misc
+    Var,
 
     // Operations
-    EQUALS,
-    ADD,
-    SUBTRACT,
-    MULTIPLY,
-    DEVIDE,
+    Equals,
+    Add,
+    Subtract,
+    Multiply,
+    Divide,
 
     // Data Types
-    STRING,
+    String,
+    Digit,
+    Float,
 }
 
 #[derive(Debug)]
@@ -62,14 +73,21 @@ fn clean_string<'a>(content: String) -> Vec<String> {
 
 pub fn main(content: String) -> Vec<Vec<Token>> {
     let rules = vec![
-        Rule::new(r"[A-Za-z0-9_]+", TType::VAR),
-        Rule::new(r"\(", TType::OPEN_PAREN),
-        Rule::new(r"\)", TType::CLOSE_PAREN),
-        Rule::new(r"fn [A-Za-z0-9_]*", TType::FUNC_START),
+        Rule::new(r"\(", TType::OpenParen),
+        Rule::new(r"\)", TType::CloseParen),
+        Rule::new(r",", TType::Comma),
+        Rule::new(r"do", TType::EnterScope),
+        Rule::new(r"end", TType::ExitScope),
+        Rule::new(r"fn", TType::FuncDef),
         //
-        Rule::new(r"=", TType::EQUALS),
+        Rule::new(r"=", TType::Equals),
+        Rule::new("\".*\"", TType::String),
+        Rule::new(r"\d+", TType::Digit),
+        Rule::new(r"\d+\.\d+", TType::Float),
         //
-        Rule::new("\".*\"", TType::STRING),
+        Rule::new(r"[A-Za-z0-9_]+", TType::Var),
+        //Whitespace
+        Rule::new(r"\s", TType::Whitespace),
     ];
 
     let mut tokens: Vec<Vec<Token>> = Vec::new();
@@ -77,9 +95,14 @@ pub fn main(content: String) -> Vec<Vec<Token>> {
     // Split the program into lines
     for (line_num, line) in clean_string(content).iter().enumerate() {
         let mut matches_this_line: Vec<PartialToken> = Vec::new();
-
+        let mut used_chars = vec![false; line.len()];
         for rule in &rules {
-            for m in rule.regex.find_iter(&line) {
+            for m in rule.regex.find_iter(line) {
+                if used_chars[m.start()] {
+                    continue;
+                }
+                used_chars.splice(m.start()..m.end(), vec![true; m.end() - m.start()]);
+
                 matches_this_line.push(PartialToken {
                     regex_match: m,
                     ttype: rule.ttype,
@@ -87,8 +110,10 @@ pub fn main(content: String) -> Vec<Vec<Token>> {
             }
         }
 
-        if matches_this_line.len() == 0 {
-            panic!("Token error at line {}", line_num)
+        for (i, c) in used_chars.iter().enumerate() {
+            if !*c {
+                panic!("Token error at {}:{}", line_num, i);
+            }
         }
 
         // Sort the tokens in the line
@@ -100,6 +125,7 @@ pub fn main(content: String) -> Vec<Vec<Token>> {
                     token: line[x.regex_match.start()..x.regex_match.end()].to_string(),
                     ttype: x.ttype,
                 })
+                .filter(|x| x.ttype != TType::Whitespace)
                 .collect::<Vec<Token>>(),
         );
     }
