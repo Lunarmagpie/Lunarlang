@@ -7,7 +7,7 @@ pub mod parse;
 
 use super::interpreter;
 
-pub fn main(filename: &String) -> Vec<parse::AST> {
+pub fn main(filename: &String) -> Vec<parse::Node> {
     // Create a path to the desired file
     let path = Path::new(filename);
     let display = path.display();

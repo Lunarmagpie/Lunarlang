@@ -2,10 +2,10 @@ use super::super::interpreter::objects::MoonObject;
 use super::super::interpreter::actions::Actions;
 
 #[derive(Debug)]
-pub struct AST {
-    pub left: Option<Box<AST>>,
-    pub right: Option<Box<AST>>,
-    pub payload: Option<ASTPayload>,
+pub struct Node {
+    pub left: Option<Box<Node>>,
+    pub right: Option<Box<Node>>,
+    pub payload: Option<Payload>,
 }
 
 #[derive(Debug)]
@@ -16,16 +16,16 @@ pub enum Constant {
 }
 
 #[derive(Debug)]
-pub enum ASTPayload {
+pub enum Payload {
     Action(Actions),
     Const(Constant),
     Var(String),
     Vars(Vec<String>),
 }
 
-impl AST {
-    pub fn new(obj: ASTPayload) -> AST {
-        AST {
+impl Node {
+    pub fn new(obj: Payload) -> Node {
+        Node {
             left: None,
             right: None,
             payload: Some(obj),
